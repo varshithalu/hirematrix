@@ -1,0 +1,13 @@
+streamlit
+fastapi
+uvicorn
+python-dotenv
+google-generativeai
+supabase
+PyPDF2 
+python-docx
+python-multipart
+transformers 
+torch
+pydantic
+pydantic[email]
