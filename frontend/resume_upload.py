@@ -3,11 +3,12 @@ import requests
 
 BACKEND_URL = "http://127.0.0.1:8000"
 
-
 def resume_upload_flow():
+
     st.subheader("Upload Your Resume")
 
-    email = st.text_input("Enter Your Email")
+    email = st.text_input("Email Address")
+    desired_role = st.text_input("Desired Position")
 
     uploaded_file = st.file_uploader(
         "Upload Resume",
@@ -20,11 +21,14 @@ def resume_upload_flow():
             st.error("Email is required")
             return
 
+        if not desired_role:
+            st.error("Desired position is required")
+            return
+
         if not uploaded_file:
             st.error("Please upload a resume")
             return
 
-        # Create or get user
         user_response = requests.post(
             f"{BACKEND_URL}/users",
             json={"email": email}
@@ -37,8 +41,8 @@ def resume_upload_flow():
         user_data = user_response.json()[0]
         user_id = user_data["id"]
 
-        # Upload resume
         with st.spinner("Extracting resume information..."):
+
             files = {
                 "file": (
                     uploaded_file.name,
@@ -46,7 +50,9 @@ def resume_upload_flow():
                 )
             }
 
-            data = {"user_id": user_id}
+            data = {
+                "user_id": user_id
+            }
 
             resume_response = requests.post(
                 f"{BACKEND_URL}/resume/upload",
@@ -60,6 +66,12 @@ def resume_upload_flow():
 
         extracted = resume_response.json()
 
+        if "error" in extracted:
+            st.error(extracted["error"])
+            return
+
+        extracted["desired_role"] = desired_role
+
         st.session_state.user_id = user_id
         st.session_state.extracted_data = extracted
         st.session_state.stage = "confirm"
@@ -68,16 +80,17 @@ def resume_upload_flow():
 
 
 def confirm_profile_and_generate():
+
     extracted = st.session_state.extracted_data
 
     st.subheader("Confirm Your Profile")
 
     st.write("### Extracted Information")
-
     st.write("**Name:**", extracted.get("full_name", ""))
     st.write("**Email:**", extracted.get("email", ""))
     st.write("**Experience:**", extracted.get("years_of_experience", ""))
     st.write("**Location:**", extracted.get("location", ""))
+    st.write("**Desired Role:**", extracted.get("desired_role", ""))
 
     tech_stack = extracted.get("tech_stack", [])
 
@@ -85,49 +98,46 @@ def confirm_profile_and_generate():
         st.error("No technologies detected in resume.")
         return
 
-    st.write("### Select 4–5 Technologies for Assessment")
-
     selected_tech = st.multiselect(
-        "Choose technologies",
+        "Select 4–5 Technologies",
         tech_stack,
         max_selections=5
     )
 
     experience_level = st.selectbox(
-        "Select Your Experience Level",
+        "Experience Level",
         ["Fresher", "2-5 Years", "Above 5 Years"]
     )
 
     if st.button("Generate Questions"):
 
-        if len(selected_tech) < 1:
-            st.error("Please select at least one technology.")
+        if not selected_tech:
+            st.error("Select at least one technology.")
             return
 
-        generate_questions(selected_tech, experience_level)
+        response = requests.post(
+            f"{BACKEND_URL}/questions/generate",
+            json={
+                "user_id": st.session_state.user_id,
+                "tech_stack": selected_tech,
+                "experience_level": experience_level,
+                "desired_role": extracted.get("desired_role")
+            }
+        )
 
+        if response.status_code != 200:
+            st.error("Question generation failed")
+            return
 
-def generate_questions(selected_tech, experience_level):
+        data = response.json()
 
-    response = requests.post(
-        f"{BACKEND_URL}/questions/generate",
-        json={
-            "user_id": st.session_state.user_id,
-            "tech_stack": selected_tech,
-            "experience_level": experience_level
-        }
-    )
+        if "error" in data:
+            st.error(data["error"])
+            return
 
-    if response.status_code != 200:
-        st.error("Question generation failed")
-        return
+        st.session_state.questions = data.get("final questions", [])
+        st.session_state.question_index = 0
+        st.session_state.stage = "screening"
 
-    data = response.json()
+        st.rerun()
 
-    questions = data.get("final questions", [])
-
-    st.session_state.questions = questions
-    st.session_state.question_index = 0
-    st.session_state.stage = "screening"
-
-    st.rerun()

@@ -13,8 +13,7 @@ Question Distribution Rules:
 Questions must be distributed across the selected technologies.
 Cover all selected technologies at least once.
 Do NOT exceed 10 total questions.
-Do NOT generate 5 questions per technology.
-Total questions must be between 8 and 10.
+Total questions must be between 3-4.
 
 Difficulty Calibration Rules:
 
@@ -49,12 +48,6 @@ Output format:
 "Question 1",
 "Question 2",
 "Question 3",
-"Question 4",
-"Question 5",
-"Question 6",
-"Question 7",
-"Question 8",
-"Question 9",
-"Question 10"
+
 ]
 }

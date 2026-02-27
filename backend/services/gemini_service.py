@@ -15,8 +15,10 @@ PROMPTS_DIR = BASE_DIR / "prompts"
 # -----------------------
 
 def load_prompt(filename: str) -> str:
-    with open(PROMPTS_DIR / filename, "r", encoding="utf-8") as file:
-        return file.read()
+    path = PROMPTS_DIR / filename
+    if not path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {path}")
+    return path.read_text(encoding="utf-8")
 
 
 def safe_json_parse(text: str | None):
@@ -25,9 +27,11 @@ def safe_json_parse(text: str | None):
 
     text = text.strip()
 
+    # Remove markdown fencing
     if text.startswith("```"):
         text = text.split("```")[1]
 
+    # Remove leading 'json'
     if text.strip().startswith("json"):
         text = text.strip()[4:].strip()
 
@@ -49,9 +53,14 @@ def generate_from_gemini(prompt: str) -> str | None:
             contents=prompt
         )
         return response.text
+
     except ClientError as e:
         print("GEMINI ERROR:", e)
-        return None
+        return "__AI_FAILURE__"
+
+    except Exception as e:
+        print("UNEXPECTED GEMINI ERROR:", e)
+        return "__AI_FAILURE__"
 
 
 # -----------------------
@@ -59,29 +68,35 @@ def generate_from_gemini(prompt: str) -> str | None:
 # -----------------------
 
 def extract_resume_data(resume_text: str):
-    template = load_prompt("resume_extraction_prompt.txt")
-    prompt = template.replace("{resume_text}", resume_text)
+    try:
+        template = load_prompt("resume_extraction_prompt.txt")
+        prompt = template.replace("{resume_text}", resume_text)
 
-    output = generate_from_gemini(prompt)
+        output = generate_from_gemini(prompt)
 
-    print("=== RAW GEMINI OUTPUT ===")
-    print(output)
-    print("=========================")
+        if output == "__AI_FAILURE__":
+            return {
+                "error": "AI service temporarily unavailable. Please try again later."
+            }
 
-    parsed = safe_json_parse(output)
+        print("=== RAW GEMINI OUTPUT ===")
+        print(output)
+        print("=========================")
 
-    if not parsed:
+        parsed = safe_json_parse(output)
+
+        if not parsed:
+            return {
+                "error": "AI response parsing failed."
+            }
+
+        return parsed
+
+    except Exception as e:
+        print("RESUME EXTRACTION ERROR:", e)
         return {
-            "full_name": "",
-            "email": "",
-            "phone": "",
-            "years_of_experience": "",
-            "desired_role": "",
-            "location": "",
-            "tech_stack": []
+            "error": "Resume extraction failed due to internal error."
         }
-
-    return parsed
 
 
 # -----------------------
@@ -90,12 +105,13 @@ def extract_resume_data(resume_text: str):
 
 def evaluate_batch(responses: list):
 
-    template = load_prompt("evaluation_prompt.txt")
+    try:
+        template = load_prompt("evaluation_prompt.txt")
 
-    formatted_block = ""
+        formatted_block = ""
 
-    for i, item in enumerate(responses):
-        formatted_block += f"""
+        for i, item in enumerate(responses):
+            formatted_block += f"""
 Question {i+1}:
 {item.question}
 
@@ -105,12 +121,30 @@ Answer:
 ------------------------
 """
 
-    prompt = template.replace("{qa_list}", formatted_block)
+        prompt = template.replace("{qa_list}", formatted_block)
 
-    output = generate_from_gemini(prompt)
+        output = generate_from_gemini(prompt)
 
-    print("=== BATCH RAW OUTPUT ===")
-    print(output)
-    print("========================")
+        if output == "__AI_FAILURE__":
+            return {
+                "error": "AI evaluation service unavailable."
+            }
 
-    return safe_json_parse(output)
+        print("=== BATCH RAW OUTPUT ===")
+        print(output)
+        print("========================")
+
+        parsed = safe_json_parse(output)
+
+        if not parsed:
+            return {
+                "error": "AI evaluation parsing failed."
+            }
+
+        return parsed
+
+    except Exception as e:
+        print("BATCH EVALUATION ERROR:", e)
+        return {
+            "error": "Batch evaluation failed due to internal error."
+        }

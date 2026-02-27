@@ -9,7 +9,8 @@ class UserCreate(BaseModel):
 class QuestionRequest(BaseModel):
     user_id: str
     tech_stack: List[str]
-    experience_level: str  # ADD THIS
+    experience_level: str
+    desired_role: str
 
 
 class QAItem(BaseModel):

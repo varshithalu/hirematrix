@@ -42,7 +42,6 @@ def technical_screening():
             st.session_state.question_index += 1
             st.rerun()
 
-
         if col2.button("Previous") and index > 0:
             st.session_state.question_index -= 1
             st.rerun()
@@ -51,25 +50,41 @@ def technical_screening():
 
         st.success("All questions answered.")
 
-        if st.button("Submit Assessment"):
+        if st.button("Submit Assessment", key="submit_final"):
 
-            response = requests.post(
-                f"{BACKEND_URL}/screening/evaluate-batch",
-                json={
-                    "user_id": st.session_state.user_id,
-                    "responses": st.session_state.answers
-                }
-            )
-
-            if response.status_code != 200:
-                st.error("Evaluation failed")
+            try:
+                response = requests.post(
+                    f"{BACKEND_URL}/screening/evaluate-batch",
+                    json={
+                        "user_id": st.session_state.user_id,
+                        "responses": st.session_state.answers
+                    }
+                )
+            except Exception as e:
+                st.error(f"Connection error: {e}")
                 return
 
-            result = response.json()
+            st.write("Status Code:", response.status_code)
+            st.write("Raw Response:", response.text)
 
-            st.success("Evaluation Complete 🎉")
+            if response.status_code != 200:
+                st.error("Evaluation failed.")
+                return
 
-            for eval_item in result["evaluations"]:
-                st.write("Score:", eval_item["score"])
-                st.write("Feedback:", eval_item["feedback"])
-                st.markdown("---")
+            try:
+                result = response.json()
+            except Exception as e:
+                st.error(f"JSON decode error: {e}")
+                return
+
+            if not isinstance(result, dict):
+                st.error("Unexpected server response.")
+                return
+
+            if "error" in result:
+                st.error(result["error"])
+                return
+
+            st.session_state.evaluation_result = result
+            st.session_state.stage = "results"
+            st.rerun()
