@@ -3,11 +3,13 @@ import requests
 
 BACKEND_URL = "http://127.0.0.1:8000"
 
-
 def technical_screening():
 
     questions = st.session_state.questions
     index = st.session_state.question_index
+
+    if "answers" not in st.session_state:
+        st.session_state.answers = []
 
     if index < len(questions):
 
@@ -18,18 +20,44 @@ def technical_screening():
 
         answer = st.text_area("Your Answer", key=f"answer_{index}")
 
-        if st.button("Submit Answer"):
+        col1, col2 = st.columns(2)
 
-            if not answer.strip():
-                st.error("Please provide an answer.")
+        if col1.button("Next"):
+
+            if answer.strip() == "":
+                st.warning("Answer cannot be empty")
                 return
 
-            response = requests.post(
-                f"{BACKEND_URL}/screening/evaluate",
-                json={
-                    "user_id": st.session_state.user_id,
+            if len(st.session_state.answers) > index:
+                st.session_state.answers[index] = {
                     "question": question,
                     "answer": answer
+                }
+            else:
+                st.session_state.answers.append({
+                    "question": question,
+                    "answer": answer
+                })
+
+            st.session_state.question_index += 1
+            st.rerun()
+
+
+        if col2.button("Previous") and index > 0:
+            st.session_state.question_index -= 1
+            st.rerun()
+
+    else:
+
+        st.success("All questions answered.")
+
+        if st.button("Submit Assessment"):
+
+            response = requests.post(
+                f"{BACKEND_URL}/screening/evaluate-batch",
+                json={
+                    "user_id": st.session_state.user_id,
+                    "responses": st.session_state.answers
                 }
             )
 
@@ -39,15 +67,9 @@ def technical_screening():
 
             result = response.json()
 
-            st.success("Evaluation Complete")
+            st.success("Evaluation Complete 🎉")
 
-            st.write("### Score:", result.get("score"))
-            st.write("### Feedback:")
-            st.write(result.get("feedback"))
-
-            st.session_state.question_index += 1
-            st.rerun()
-
-    else:
-        st.success("Screening Completed 🎉")
-        st.balloons()
+            for eval_item in result["evaluations"]:
+                st.write("Score:", eval_item["score"])
+                st.write("Feedback:", eval_item["feedback"])
+                st.markdown("---")

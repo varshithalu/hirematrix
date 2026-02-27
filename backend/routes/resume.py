@@ -14,6 +14,9 @@ async def upload_resume(
         return {"error": "No file uploaded"}
 
     text = parse_resume(file)
+    print("==== RESUME TEXT START ====")
+    print(text[:1000])
+    print("==== RESUME TEXT END ====")
 
     if not text:
         return {"error": "Unable to extract text from resume"}
@@ -26,3 +29,7 @@ async def upload_resume(
     save_resume(user_id, text, structured)
 
     return structured
+
+
+
+

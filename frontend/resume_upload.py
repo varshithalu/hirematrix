@@ -124,9 +124,7 @@ def generate_questions(selected_tech, experience_level):
 
     data = response.json()
 
-    questions = []
-    for tech in data:
-        questions.extend(data[tech])
+    questions = data.get("final questions", [])
 
     st.session_state.questions = questions
     st.session_state.question_index = 0

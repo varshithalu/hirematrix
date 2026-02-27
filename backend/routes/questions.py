@@ -7,6 +7,12 @@ router = APIRouter()
 
 @router.post("/generate")
 async def create_questions(data: QuestionRequest):
-    questions = generate_questions(data.tech_stack)
+
+    questions = generate_questions(
+        tech_stack=data.tech_stack,
+        experience_level=data.experience_level
+    )
+
     save_questions(data.user_id, data.tech_stack, questions)
+
     return questions

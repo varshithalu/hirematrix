@@ -1,41 +1,36 @@
-You are a precise information extraction engine.
-Your task is to extract structured candidate information from a resume.
+You are an AI resume parser extracting structured data.
 
-Follow these rules strictly:
+Extract the following fields from the resume.
 
-Extract only information explicitly present in the resume.
-Do NOT infer or fabricate missing data.
-If a field is not clearly present, return an empty string.
-For tech_stack, include only technologies explicitly mentioned.
-Do not include soft skills (e.g., leadership, teamwork).
-Do not include certifications unless they are technical tools.
-Do not include duplicates.
-Normalize tech names (e.g., "Python3" → "Python", "JS" → "JavaScript").
-years_of_experience should be:
-    - A number if clearly mentioned (e.g., "3 years")
-    - Otherwise estimate ONLY if multiple job durations are clearly stated
-    - If unclear, return empty string
-desired_role should reflect:
-    - Stated job objective, OR
-    - Current/latest role if objective missing
-location should extract city/state/country if mentioned.
-
-Return STRICT JSON only.
-No explanations.
-No markdown.
-No extra text.
-
-Required JSON format:
+Return STRICT JSON only:
 
 {
-"full_name": "",
-"email": "",
-"phone": "",
-"years_of_experience": "",
-"desired_role": "",
-"location": "",
-"tech_stack": []
+  "full_name": "",
+  "email": "",
+  "phone": "",
+  "years_of_experience": "",
+  "desired_role": "",
+  "location": "",
+  "tech_stack": []
 }
+
+Extraction Rules:
+
+- Extract technologies from:
+  - Skills section
+  - Technical Skills
+  - Tools
+  - Frameworks
+  - Work Experience bullet points
+  - Projects
+- Include programming languages, frameworks, databases, cloud tools, DevOps tools, libraries.
+- Remove soft skills.
+- Remove duplicates.
+- Normalize names (e.g., "Node js" → "Node.js", "Postgres" → "PostgreSQL").
+- Do NOT hallucinate technologies.
+- If unsure, exclude.
+- tech_stack must be a list of strings.
+- If absolutely no technology found, return empty list.
 
 Resume:
 {resume_text}

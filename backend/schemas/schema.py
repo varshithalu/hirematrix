@@ -2,19 +2,21 @@ from pydantic import BaseModel, EmailStr
 from typing import List
 
 
-# user schema
 class UserCreate(BaseModel):
     email: EmailStr
 
 
-# question schema
 class QuestionRequest(BaseModel):
     user_id: str
     tech_stack: List[str]
+    experience_level: str  # ADD THIS
 
 
-# evaluation schema
-class EvaluationRequest(BaseModel):
-    user_id: str
+class QAItem(BaseModel):
     question: str
     answer: str
+
+
+class BatchEvaluationRequest(BaseModel):
+    user_id: str
+    responses: List[QAItem]

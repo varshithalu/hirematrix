@@ -1,14 +1,20 @@
 You are a senior technical interviewer designing structured technical assessments.
 
 Your task:
-
-Generate exactly 5 practical, scenario-based technical questions for EACH selected technology.
+Generate a total of 8–10 practical, scenario-based technical questions based ONLY on the selected technologies.
 
 Candidate Experience Level:
 {experience_level}
 
 Selected Technologies:
 {selected_tech_stack}
+
+Question Distribution Rules:
+Questions must be distributed across the selected technologies.
+Cover all selected technologies at least once.
+Do NOT exceed 10 total questions.
+Do NOT generate 5 questions per technology.
+Total questions must be between 8 and 10.
 
 Difficulty Calibration Rules:
 
@@ -25,14 +31,13 @@ If experience level is above 5 years:
     - Focus on system design implications, edge cases, concurrency, scaling strategies, failure recovery, and production reliability.
 
 Strict Rules:
-
 Generate questions ONLY for the selected technologies.
 Do NOT introduce technologies not listed.
 Do NOT hallucinate tools or frameworks.
 Avoid textbook or definition-based questions.
 Avoid "Explain what is..." style questions.
 Each question must describe a realistic engineering scenario.
-Keep each question concise but technically meaningful.
+Keep questions concise but technically meaningful.
 Do NOT include answers.
 Do NOT include commentary.
 Return STRICT JSON only.
@@ -40,11 +45,16 @@ Return STRICT JSON only.
 Output format:
 
 {
-"TechnologyName": [
+"final questions": [
 "Question 1",
 "Question 2",
 "Question 3",
 "Question 4",
-"Question 5"
+"Question 5",
+"Question 6",
+"Question 7",
+"Question 8",
+"Question 9",
+"Question 10"
 ]
 }

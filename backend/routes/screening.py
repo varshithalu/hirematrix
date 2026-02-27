@@ -1,25 +1,26 @@
 from fastapi import APIRouter
-from schemas.schema import EvaluationRequest
-from services.gemini_service import evaluate_answer
+from schemas.schema import BatchEvaluationRequest
+from services.gemini_service import evaluate_batch
 from database.queries import save_evaluation
 
 router = APIRouter()
 
-@router.post("/evaluate")
-async def evaluate(data: EvaluationRequest):
-    result = evaluate_answer(data.question, data.answer)
+@router.post("/evaluate-batch")
+async def evaluate_batch_route(data: BatchEvaluationRequest):
 
-    if not result:
+    result = evaluate_batch(data.responses)
+
+    if not result or "evaluations" not in result:
         return {"error": "Evaluation failed"}
 
-    score = result.get("score", 0)
-
-    save_evaluation(
-        data.user_id,
-        data.question,
-        data.answer,
-        result,
-        score
-    )
+    # Save each evaluation
+    for idx, eval_item in enumerate(result["evaluations"]):
+        save_evaluation(
+            data.user_id,
+            data.responses[idx].question,
+            data.responses[idx].answer,
+            eval_item,
+            eval_item.get("score", 0)
+        )
 
     return result
