@@ -169,7 +169,7 @@ elif st.session_state.stage == "exit":
 
     response = requests.get(f"{BACKEND_URL}/system/exit")
 
-    st.markdown('<div class="hero-title">👋 Next Steps</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">Final Review </div>', unsafe_allow_html=True)
 
     if response.status_code == 200:
         data = response.json()
