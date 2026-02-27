@@ -22,8 +22,11 @@ def technical_screening():
 
         col1, col2 = st.columns(2)
 
-        if col1.button("Next"):
+        if col1.button("Previous") and index > 0:
+            st.session_state.question_index -= 1
+            st.rerun()
 
+        if col2.button("Next"):
             if answer.strip() == "":
                 st.warning("Answer cannot be empty")
                 return
@@ -41,11 +44,6 @@ def technical_screening():
 
             st.session_state.question_index += 1
             st.rerun()
-
-        if col2.button("Previous") and index > 0:
-            st.session_state.question_index -= 1
-            st.rerun()
-
     else:
 
         st.success("All questions answered.")

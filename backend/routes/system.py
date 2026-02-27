@@ -6,7 +6,7 @@ router = APIRouter()
 def get_greeting():
     return {
         "message": "Welcome to HireMatrix: AI- Driven Hiring Assistant",
-        "overview": "This system will collect your profile details and conduct a structured technical assessment based on your selected technologies."
+        "overview": "We collect your professional details and generate a structured technical assessment customized to your selected technology stack."
     }
 
 @router.get("/exit")

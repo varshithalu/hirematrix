@@ -85,7 +85,6 @@ def confirm_profile_and_generate():
 
     st.subheader("Confirm Your Profile")
 
-    st.write("### Extracted Information")
     st.write("**Name:**", extracted.get("full_name", ""))
     st.write("**Email:**", extracted.get("email", ""))
     st.write("**Experience:**", extracted.get("years_of_experience", ""))
@@ -109,7 +108,7 @@ def confirm_profile_and_generate():
         ["Fresher", "2-5 Years", "Above 5 Years"]
     )
 
-    if st.button("Generate Questions"):
+    if st.button("Proceed"):
 
         if not selected_tech:
             st.error("Select at least one technology.")

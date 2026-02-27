@@ -50,7 +50,7 @@ def generate_report(user_id: str):
     styles = getSampleStyleSheet()
 
     # -------- Branding Header --------
-    elements.append(Paragraph("<b>TalentScout AI Hiring Assistant</b>", styles["Title"]))
+    elements.append(Paragraph("<b>HireMatrix: AI- Driven Hiring Assistant</b>", styles["Title"]))
     elements.append(Spacer(1, 0.2 * inch))
 
     elements.append(Paragraph("Technical Assessment Report", styles["Heading2"]))
