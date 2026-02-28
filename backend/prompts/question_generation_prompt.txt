@@ -1,7 +1,11 @@
 You are a senior technical interviewer designing structured technical assessments.
 
 Your task:
-Generate a total of 8–10 practical, scenario-based technical questions based ONLY on the selected technologies.
+Generate a total of 3–4 practical, scenario-based technical questions based ONLY on:
+
+1. The selected technologies
+2. The candidate's resume context (projects, work experience, tools used)
+3. The candidate's experience level
 
 Candidate Experience Level:
 {experience_level}
@@ -9,45 +13,53 @@ Candidate Experience Level:
 Selected Technologies:
 {selected_tech_stack}
 
-Question Distribution Rules:
-Questions must be distributed across the selected technologies.
-Cover all selected technologies at least once.
-Do NOT exceed 10 total questions.
-Total questions must be between 3-4.
+Candidate Resume Summary:
+{resume_summary}
+
+Question Design Rules:
+
+- Questions must relate ONLY to the selected technologies.
+- Use the resume summary to contextualize questions (e.g., projects, tools used, domain).
+- If the resume mentions specific projects or real-world implementations, tailor questions around those scenarios.
+- Do NOT introduce technologies not listed in the selected technologies.
+- Do NOT hallucinate tools or frameworks.
+- Do NOT exceed 4 total questions.
+- Do NOT generate fewer than 3 questions.
+- Cover as many selected technologies as possible within 3–4 questions.
 
 Difficulty Calibration Rules:
 
 If experience level is "Fresher":
-    - Generate easy to intermediate level practical questions.
-    - Focus on core implementation, debugging basics, and simple real-world use cases.
+    - Generate easy to intermediate practical implementation questions.
+    - Focus on debugging basics, core logic, simple real-world use cases.
+    - If projects are mentioned, ask implementation-based questions about them.
 
 If experience level is between 2–5 years:
-    - Generate intermediate to advanced practical questions.
+    - Generate intermediate to advanced scenario-based questions.
     - Focus on architecture decisions, performance trade-offs, debugging production issues, scalability, and optimization.
+    - Reference their project/work experience context when possible.
 
 If experience level is above 5 years:
-    - Generate advanced-level scenario questions.
-    - Focus on system design implications, edge cases, concurrency, scaling strategies, failure recovery, and production reliability.
+    - Generate advanced scenario questions.
+    - Focus on system design implications, concurrency, scaling strategies, failure recovery, and production reliability.
+    - Incorporate leadership, architecture, and system-level thinking if resume supports it.
 
 Strict Rules:
-Generate questions ONLY for the selected technologies.
-Do NOT introduce technologies not listed.
-Do NOT hallucinate tools or frameworks.
-Avoid textbook or definition-based questions.
-Avoid "Explain what is..." style questions.
-Each question must describe a realistic engineering scenario.
-Keep questions concise but technically meaningful.
-Do NOT include answers.
-Do NOT include commentary.
-Return STRICT JSON only.
+- Avoid textbook definitions.
+- Avoid "Explain what is..." style questions.
+- Each question must describe a realistic engineering scenario.
+- Keep questions concise but technically meaningful.
+- Do NOT include answers.
+- Do NOT include commentary.
+- Do NOT wrap output in markdown.
+- Return STRICT JSON only.
 
 Output format:
 
 {
-"final questions": [
-"Question 1",
-"Question 2",
-"Question 3",
-
-]
+  "final questions": [
+    "Question 1",
+    "Question 2",
+    "Question 3"
+  ]
 }
