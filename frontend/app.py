@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from resume_upload import resume_upload_flow, confirm_profile_and_generate
-from screening_ui import technical_screening
+from screening_ui import technical_screening, review_answers
 
 BACKEND_URL = "http://127.0.0.1:8000"
 
@@ -92,8 +92,6 @@ if st.session_state.stage == "greeting":
         st.markdown('<div class="hero-title">🧠 HireMatrix</div>', unsafe_allow_html=True)
         st.markdown('<div class="hero-sub">AI-Driven Technical Hiring Platform</div>', unsafe_allow_html=True)
 
-
-        # Welcome Message inside grey card
         st.markdown(
             f'<div class="welcome-banner">{data.get("message")}</div>',
             unsafe_allow_html=True
@@ -135,6 +133,14 @@ elif st.session_state.stage == "screening":
 
     st.markdown('<div class="hero-title"> Technical Assessment💻</div>', unsafe_allow_html=True)
     technical_screening()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+# ✅ NEW REVIEW STAGE (only addition)
+elif st.session_state.stage == "review":
+
+    st.markdown('<div class="hero-title">Review Your Answers</div>', unsafe_allow_html=True)
+    review_answers()
     st.markdown('</div>', unsafe_allow_html=True)
 
 
